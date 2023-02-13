@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "build": "tsc",
-    "start": "tsc && node dist/app.js",
+    "build": "tsc -p .",
+    "start": "node dist/app.js",
     "lint": "eslint . --ext .ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
