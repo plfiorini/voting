@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  title: Voting API
+  version: 1.0.0
+paths:
+  /vote:
+    post:
+      summary: Submit a vote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vote:
+                  type: string
+      responses:
+        '200':
+          description: OK

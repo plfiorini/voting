@@ -2,7 +2,11 @@ import express from 'express';
 import { Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import swaggerUi from 'swagger-ui-express';
+import yaml from 'js-yaml';
+import fs from 'fs';
 import config from './config';
+import SwaggerDocument from './swagger.interface';
 import votesRoutes from './routes/votes.route';
 
 const app = express();
@@ -17,11 +21,15 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use(votesRoutes);
 
-if (require.main === module) {
-    const PORT = config.port;
+// OpenAPI documentation
+const swaggerObject = yaml.load(fs.readFileSync('docs/swagger.yaml', 'utf8'));
+const swaggerDocument = swaggerObject as SwaggerDocument;
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-    app.listen(PORT, () => {
-        console.log(`Server is listening on port ${PORT}.`);
+// Listen
+if (require.main === module) {
+    app.listen(config.port, () => {
+        console.log(`Server is listening on port ${config.port}.`);
     });
 }
 

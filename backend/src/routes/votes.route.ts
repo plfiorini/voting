@@ -3,6 +3,6 @@ import { vote } from '../controllers/votes.controller';
 
 const router = Router();
 
-router.post('/votes', vote);
+router.post('/vote', vote);
 
 export default router;
