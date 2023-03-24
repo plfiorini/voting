@@ -1,6 +1,7 @@
 import express from 'express';
 import { Request, Response } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
@@ -12,6 +13,7 @@ import votesRoutes from './routes/votes.route';
 const app = express();
 
 app.use(cors());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
