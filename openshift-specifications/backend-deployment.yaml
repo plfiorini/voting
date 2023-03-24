@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: DeploymentConfig
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: plfiorini/voting-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NODE_ENV
+              value: production
+          command: ["npm", "run", "start"]
