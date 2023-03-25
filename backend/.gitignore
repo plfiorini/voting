@@ -10,6 +10,7 @@ node_modules
 
 # Built files
 build
+dist
 
 # IDE files
 .vscode
