@@ -1,7 +1,21 @@
+import path from 'path';
+import { publishToSQS } from './sqs.service';
+import config from '../config';
+
 export async function saveVote(voterId: string, vote: string): Promise<void> {
+  const message = { voterId: voterId, vote: vote };
+  const options = {
+    queueUrl: path.resolve(config.aws.sqsBaseUrl, 'votes')
+  };
   return new Promise<void>((resolve, reject) => {
-    const object = { voterId: voterId, vote: vote };
-    // TODO: Save data
-    resolve();
+    publishToSQS(message, options)
+      .then(() => {
+        console.log('Message published successfully');
+        resolve();
+      })
+      .catch((err) => {
+        console.error(`Error publishing message: ${err}`);
+        reject();
+      });
   });
 }

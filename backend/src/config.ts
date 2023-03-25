@@ -8,6 +8,12 @@ dotenv.config({ debug: true, path: path.resolve(__dirname, '..', 'environment', 
 const config = {
     environment: environment,
     port: process.env.PORT,
+    aws: {
+        region: process.env.AWS_REGION || '',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+        sqsBaseUrl: process.env.AWS_SQS_BASE_URL || '',
+    },
 };
 
 export default config;

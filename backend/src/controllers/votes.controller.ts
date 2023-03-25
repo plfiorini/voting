@@ -7,8 +7,11 @@ export const vote = async (req: Request, res: Response) => {
     // Get or create voter ID from cookie
     let voterId = req.cookies.voter_id;
     if (!voterId) {
-        voterId = Math.random().toString(36).substr(2, 9); // Generate random ID
-        res.cookie('voter_id', voterId); // Save voter ID in cookie
+        // Generate random ID
+        voterId = Math.random().toString(36).substr(2, 9);
+
+        // Save voter ID in cookie
+        res.cookie('voter_id', voterId);
     }
 
     // Save vote
@@ -17,6 +20,6 @@ export const vote = async (req: Request, res: Response) => {
         res.status(200).json({ message: 'Vote received!' });
     } catch (err) {
         console.error('Error saving vote', err);
-        res.status(500).send('Error saving vote');
+        res.status(500).json({ message: 'Error saving vote' });
     }
 };
