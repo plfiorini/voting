@@ -39,7 +39,11 @@ for question, options in poll_questions.items():
 # List
 response = requests.get(polls_url)
 print_response('List', response)
-first_id = response.json()[0]['id']
+polls = response.json()
+first_poll = polls[0]
+first_id = first_poll['id']
+second_poll = polls[1]
+second_id = polls[2]['id']
 
 # Get
 response = requests.get(f'{polls_url}/{first_id}')
@@ -52,7 +56,6 @@ print_response('Update', response)
 # List
 response = requests.get(polls_url)
 print_response('List', response)
-first_id = response.json()[0]['id']
 
 # Delete
 response = requests.delete(f'{polls_url}/{first_id}')
@@ -60,4 +63,12 @@ print_response('Delete', response)
 
 # Get
 response = requests.get(f'{polls_url}/{first_id}')
+print_response('Get', response)
+
+# Vote
+response = requests.post(f'{polls_url}/{second_id}/vote', {'option': second_poll['options'][1]})
+print_response('Vote', response)
+
+# Get
+response = requests.get(f'{polls_url}/{second_id}')
 print_response('Get', response)

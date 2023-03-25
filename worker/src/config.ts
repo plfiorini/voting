@@ -7,7 +7,6 @@ dotenv.config({ debug: true, path: path.resolve(__dirname, '..', 'environment', 
 
 const config = {
     environment: environment,
-    port: Number(process.env.PORT || 3000),
     aws: {
         endpoint: process.env.AWS_ENDPOINT,
         region: process.env.AWS_REGION || '',
