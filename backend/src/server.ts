@@ -31,7 +31,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Listen
 if (require.main === module) {
     app.listen(config.port, () => {
-        console.log(`Server is listening on port ${config.port}.`);
+        console.log(`Server is listening on port ${config.port} on environment ${config.environment}`);
     });
 }
 
