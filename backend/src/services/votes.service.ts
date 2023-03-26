@@ -5,7 +5,7 @@ import config from '../config';
 export async function saveVote(voterId: string, vote: string): Promise<void> {
   const message = { voterId: voterId, vote: vote };
   const options = {
-    queueUrl: path.resolve(config.aws.sqsBaseUrl, 'votes')
+    queueUrl: config.aws.queueUrl,
   };
   return new Promise<void>((resolve, reject) => {
     publishToSQS(message, options)
