@@ -1,4 +1,4 @@
-import { SQS } from 'aws-sdk';
+import AWS from 'aws-sdk';
 import config from '../config';
 
 interface IMessage {
@@ -10,7 +10,8 @@ interface IPublishOptions {
 }
 
 export async function publishToSQS(message: IMessage, options: IPublishOptions): Promise<void> {
-    const sqs = new SQS({
+    const sqs = new AWS.SQS({
+        endpoint: config.aws.endpoint ? new AWS.Endpoint(config.aws.endpoint) : undefined,
         region: config.aws.region,
         accessKeyId: config.aws.accessKeyId,
         secretAccessKey: config.aws.secretAccessKey,
