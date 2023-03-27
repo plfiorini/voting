@@ -1,9 +1,8 @@
-import path from 'path';
 import { publishToSQS } from './sqs.service';
 import config from '../config';
 
-export async function saveVote(voterId: string, vote: string): Promise<void> {
-  const message = { voterId: voterId, vote: vote };
+export async function saveVote(pollId: string, optionId: number): Promise<void> {
+  const message = { pollId: pollId, optionId: optionId };
   const options = {
     queueUrl: config.aws.queueUrl,
   };

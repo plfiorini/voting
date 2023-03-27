@@ -1,20 +1,133 @@
 openapi: 3.0.0
 info:
-  title: Voting API
+  title: Polls API
+  description: REST API for managing polls in DynamoDB
   version: 1.0.0
+servers:
+  - url: http://localhost:8080
 paths:
-  /vote:
+  /polls:
+    get:
+      summary: Get a list of all polls
+      responses:
+        '200':
+          description: A list of polls
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Poll'
     post:
-      summary: Submit a vote
+      summary: Create a new poll
       requestBody:
+        description: The poll to create
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                vote:
-                  type: string
+              $ref: '#/components/schemas/NewPoll'
+      responses:
+        '201':
+          description: The created poll
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+  /polls/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The ID of the poll to retrieve or modify
+        schema:
+          type: string
+    get:
+      summary: Get a poll by ID
       responses:
         '200':
-          description: OK
+          description: The poll with the given ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '404':
+          description: Poll not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      summary: Update a poll by ID
+      requestBody:
+        description: The updated poll
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPoll'
+      responses:
+        '200':
+          description: The updated poll
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '404':
+          description: Poll not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      summary: Delete a poll by ID
+      responses:
+        '200':
+          description: Poll deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Poll not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+components:
+  schemas:
+    Poll:
+      type: object
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+    NewPoll:
+      type: object
+      properties:
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+      required:
+        - question
+        - options

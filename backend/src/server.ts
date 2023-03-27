@@ -8,7 +8,7 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import config from './config';
 import SwaggerDocument from './swagger.interface';
-import votesRoutes from './routes/votes.route';
+import { pollRouter } from './routes/poll';
 
 const app = express();
 
@@ -17,11 +17,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!');
-});
-
-app.use(votesRoutes);
+app.use('/polls', pollRouter);
 
 // OpenAPI documentation
 const swaggerObject = yaml.load(fs.readFileSync('docs/swagger.yaml', 'utf8'));
