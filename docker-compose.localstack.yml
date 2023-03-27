@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   localstack:
-    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    container_name: localstack_main
     image: localstack/localstack:latest
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
@@ -12,11 +12,12 @@ services:
       - "127.0.0.1:4510-4530:4510-4530"  # ext services port range
       - "127.0.0.1:4571:4571"            #
     environment:
-      - DEBUG=${DEBUG-}
-      - SERVICES=${SERVICES-}
+      - DEBUG=0
+      - PERSISTENCE=1
+      - EAGER_SERVICE_LOADING=1
+      - SERVICES=sqs
       - EDGE_PORT=4566
       - LAMBDA_EXECUTOR=local
-      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY-}
       - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
       - DOCKER_HOST=unix:///var/run/docker.sock
       - DISABLE_CORS_CHECKS=1
@@ -24,3 +25,7 @@ services:
     volumes:
       - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "localstack:/var/lib/localstack"
+
+volumes:
+  localstack:
