@@ -1,22 +1,28 @@
-import { DynamoDBClient, CreateTableCommand, DescribeTableCommand, PutItemCommand, GetItemCommand, UpdateItemCommand, DeleteItemCommand, ScanCommand, AttributeValue } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, CreateTableCommand, DescribeTableCommand, PutItemCommand, GetItemCommand, UpdateItemCommand, DeleteItemCommand, ScanCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
+import Database from './database';
 import config from '../config';
-import Poll from '../polls/poll.model';
+import { Poll, Vote } from '../polls/poll.model';
+import NotFoundError from '../errors/notfound';
 
-function votesAttributesToMap(attributes?: Record<string, AttributeValue>): Map<string, number> {
-    const result = new Map<string, number>();
-    if (attributes !== undefined) {
+function votesAttributesToMap(attributes?: Record<string, AttributeValue>): Vote {
+    let result: Vote = {};
+    if (attributes) {
         for (const [key, value] of Object.entries(attributes)) {
-            result.set(key, Number(value.N || 0));
+            const num = Number(value?.N ?? 0);
+            if (!isNaN(num)) {
+                result[key] = num;
+            }
         }
     }
     return result;
 }
 
-class PollService {
-    private client: DynamoDBClient;
-    private tableName: string = config.aws.tableName;
+class DynamoDBDatabase implements Database {
+    private readonly client: DynamoDBClient;
+    private readonly tableName: string = config.database.table;
 
     constructor() {
+        console.info(`Connecting to DynamoDB database at ${config.aws.endpoint}...`);
         this.client = new DynamoDBClient({
             endpoint: config.aws.endpoint,
             region: config.aws.region,
@@ -27,6 +33,22 @@ class PollService {
         });
 
         // Creo la tabella se non esiste
+        this.createTableIfExists().catch(err => console.error(err));
+    }
+
+    isConnnected(): boolean {
+        return true;
+    }
+
+    async connect(): Promise<void> {
+        // Niente da fare, ci siamo già connessi nel costruttore
+    }
+
+    async disconnect(): Promise<void> {
+        // Niente da fare, ci siamo già connessi nel costruttore
+    }
+
+    async createTableIfExists(): Promise<void> {
         const command = new DescribeTableCommand({ TableName: this.tableName });
         this.client.send(command).catch(async (err) => {
             if (err.name === 'ResourceNotFoundException') {
@@ -35,6 +57,21 @@ class PollService {
                 console.error(err);
             }
         });
+    }
+
+    async createTable(): Promise<void> {
+        const command = new CreateTableCommand({
+            TableName: this.tableName,
+            KeySchema: [
+                { AttributeName: 'id', KeyType: 'HASH' }
+            ],
+            AttributeDefinitions: [
+                { AttributeName: 'id', AttributeType: 'S' }
+            ],
+            BillingMode: 'PAY_PER_REQUEST',
+        });
+        await this.client.send(command);
+        console.log(`Table "${this.tableName}" created successfully.`);
     }
 
     async listPolls(): Promise<Poll[] | undefined> {
@@ -64,7 +101,7 @@ class PollService {
         return poll;
     }
 
-    async getPollById(id: string): Promise<Poll | null> {
+    async getPollById(id: string): Promise<Poll | undefined> {
         const command = new GetItemCommand({
             TableName: this.tableName,
             Key: {
@@ -74,7 +111,7 @@ class PollService {
         const response = await this.client.send(command);
         const item = response.Item;
         if (!item) {
-            return null;
+            throw new NotFoundError(`Poll with id "${id}" not found`);
         }
         return {
             id: item.id.S!,
@@ -119,27 +156,6 @@ class PollService {
         });
         await this.client.send(command);
     }
-
-    async deleteAllPolls(): Promise<void> {
-        this.listPolls().then((polls) => {
-            this.deletePollById(polls![0].id!);
-        });
-    }
-
-    private async createTable(): Promise<void> {
-        const command = new CreateTableCommand({
-            TableName: this.tableName,
-            KeySchema: [
-                { AttributeName: 'id', KeyType: 'HASH' }
-            ],
-            AttributeDefinitions: [
-                { AttributeName: 'id', AttributeType: 'S' }
-            ],
-            BillingMode: 'PAY_PER_REQUEST',
-        });
-        await this.client.send(command);
-        console.log(`Table "${this.tableName}" created successfully.`);
-    }
 }
 
-export default PollService;
+export default DynamoDBDatabase;

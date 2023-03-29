@@ -1,29 +1,47 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    hostname: rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_logs:/var/log/rabbitmq
+    restart: always
+
+  mongo:
+    image: mongo:6-jammy
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
   backend:
     build: backend
     ports:
       - 8080:8080
     environment:
-      - NODE_ENV=docker
+      - NODE_ENV=empty
       - PORT=8080
-      - AWS_ENDPOINT=http://127.0.0.1:4566
-      - AWS_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_QUEUE_NAME=votes
-      - AWS_TABLE_NAME=Polls
+      - QUEUE_BACKEND=amqp
+      - DATABASE_BACKEND=mongodb
+      - AMQP_URL=amqp://guest:guest@rabbitmq:5672
+      - MONGODB_URL=mongodb://mongoadmin:secret@mongo:27017
     restart: always
 
   worker:
     build: worker
     environment:
-      - NODE_ENV=docker
-      - AWS_ENDPOINT=http://127.0.0.1:4566
-      - AWS_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_QUEUE_NAME=votes
-      - AWS_TABLE_NAME=Polls
+      - NODE_ENV=empty
+      - QUEUE_BACKEND=amqp
+      - DATABASE_BACKEND=mongodb
+      - AMQP_URL=amqp://guest:guest@rabbitmq:5672
+      - MONGODB_URL=mongodb://mongoadmin:secret@mongo:27017
     restart: always
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_logs:
+  mongodb_data:

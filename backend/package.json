@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "NODE_ENV=local ts-node-dev --respawn --transpile-only src/main.ts",
-    "start:prod": "NODE_ENV=production ts-node-dev src/main.ts",
-    "start:test": "NODE_ENV=test ts-node-dev src/main.ts",
+    "start:docker": "NODE_ENV=docker ts-node-dev --respawn --transpile-only src/main.ts",
+    "start:localstack": "NODE_ENV=localstack ts-node-dev --respawn --transpile-only src/main.ts",
     "serve": "node build/main.js",
     "test": "NODE_ENV=ci jest --config=jest.config.js",
     "test-watch": "NODE_ENV=ci jest --config=jest.config.js --watchAll"
@@ -24,16 +24,19 @@
     "@types/express": "^4.17.17",
     "@types/node": "^18.15.7",
     "@types/swagger-ui-express": "^4.1.3",
+    "amqplib": "^0.10.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "mongodb": "^5.1.0",
     "swagger-ui-express": "^4.6.2",
     "typescript": "^5.0.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.1",
     "@types/cookie-parser": "^1.4.3",
     "@types/jest": "^29.5.0",
     "@types/js-yaml": "^4.0.5",

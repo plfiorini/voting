@@ -2,7 +2,11 @@ interface Poll {
     id: string;
     question: string;
     options: string[];
-    votes?: Map<string, number>;
+    votes?: Vote;
 }
 
-export default Poll;
+type Vote = {
+    [key: string]: number;
+};
+
+export { Poll, Vote };

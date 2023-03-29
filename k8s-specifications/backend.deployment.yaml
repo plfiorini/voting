@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: plfiorini/voting-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NODE_ENV
+              value: empty
+            - name: PORT
+              value: "8080"
+            - name: QUEUE_BACKEND
+              value: amqp
+            - name: DATABASE_BACKEND
+              value: mongodb
+            - name: AMQP_URL
+              value: amqp://guest:guest@rabbitmq:5672
+            - name: MONGODB_URL
+              value: mongodb://mongoadmin:secret@mongo:27017
+          command: ["npm", "run", "start"]

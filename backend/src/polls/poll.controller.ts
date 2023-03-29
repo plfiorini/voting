@@ -1,16 +1,27 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import Controller from '../controller';
-import PollService from '../services/poll';
-import Poll from './poll.model';
-import { saveVote } from '../services/votes';
+import PollService from './poll.service';
+import { Poll } from './poll.model';
+import VoteService from './vote';
+import BadRequestError from '../errors/badrequest';
 
 class PollsController extends Controller {
-    private pollService = new PollService();
+    public path = '/polls';
+    private readonly pollService = new PollService();
+    private readonly voteService = new VoteService();
 
     constructor() {
         super();
         this.initializeRoutes();
+
+        this.pollService.connect();
+        this.voteService.connect();
+    }
+
+    destructor() {
+        this.voteService.disconnect();
+        this.pollService.disconnect();
     }
 
     private initializeRoutes() {
@@ -91,9 +102,9 @@ class PollsController extends Controller {
         const id = req.params.id;
         const { option } = req.body as { option: string };
         if (option === undefined) {
-            res.status(400).json({ message: 'Missing option' });
+            throw new BadRequestError('Missing option');
         } else {
-            saveVote(id, option);
+            this.voteService.saveVote(id, option);
             res.json({ message: `Vote for poll ${id} queued` });
         }
     }

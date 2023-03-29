@@ -6,8 +6,9 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'js-yaml';
 import fs from 'fs';
 import config from './config';
-import SwaggerDocument from './swagger.interface';
+import SwaggerDocument from './interfaces/swagger';
 import Controller from './controller';
+import HttpError from './errors/httperror';
 
 class App {
     public app: express.Application;
@@ -17,21 +18,42 @@ class App {
         this.app = express();
         this.port = port;
 
-        this.initializeMiddlewares();
-        this.initializeControllers(controllers);
+        this.initializeMiddlewares(controllers);
         this.initializeSwagger();
     }
 
-    private initializeMiddlewares() {
+    private initializeMiddlewares(controllers: Controller[]) {
+        // Middleware per loggare le richieste HTTP
+        this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+            console.log(`${req.method} ${req.path}`);
+            next();
+        });
+
+        // Middleware per cross-origin resource sharing (CORS)
         this.app.use(cors());
+
+        // Middleware per la gestione delle richieste HTTP
         this.app.use(cookieParser());
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
-    }
 
-    private initializeControllers(controllers: Controller[]) {
         controllers.forEach((controller) => {
-            this.app.use('/polls', controller.router);
+            this.app.use(controller.path, controller.router);
+        });
+
+        // Middleware for la gestione degli errori
+        this.app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            if (err instanceof HttpError) {
+                res.status(err.statusCode).json({ error: err.message });
+            } else {
+                console.error(err);
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        });
+
+        // Middleware per i path inesistenti
+        this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+            res.status(404).json({ error: 'Not found' });
         });
     }
 
