@@ -1,4 +1,4 @@
-import Poll from '../polls/poll.model';
+import { Poll } from '../polls/poll.model';
 
 interface Database {
     connect(): Promise<void>;

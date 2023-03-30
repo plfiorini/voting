@@ -2,7 +2,7 @@ import config, { DatabaseBackendType } from '../config';
 import Database from '../database/database';
 import DynamoDBDatabase from '../database/dynamodb.backend';
 import MongoDBDatabase from '../database/mongodb.backend';
-import Poll from './poll.model';
+import { Poll } from './poll.model';
 
 class PollService {
     private readonly database: Database;
