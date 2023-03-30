@@ -19,6 +19,7 @@ services:
     restart: always
 
   backend:
+    image: docker.io/plfiorini/voting-backend:latest
     build: backend
     ports:
       - 8080:8080
@@ -32,6 +33,7 @@ services:
     restart: always
 
   worker:
+    image: docker.io/plfiorini/voting-worker:latest
     build: worker
     environment:
       - NODE_ENV=empty
