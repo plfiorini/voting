@@ -64,6 +64,7 @@ class App {
     }
 
     public listen() {
+        console.info(`Starting backend on port ${this.port} (${config.environment})...`);
         this.app.listen(this.port, () => {
             console.log(`Backend listening on the port ${this.port} (${config.environment})`);
         });
